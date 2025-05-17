@@ -67,7 +67,7 @@ export const addRegistro = async (req, res) => {
 
     res.json({
       id: result.insertId,
-      id_alumno, id_libro, inicio, fin
+      result
     }).status(201);
 
   } catch (error) {

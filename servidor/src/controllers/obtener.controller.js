@@ -1,62 +1,10 @@
 /* Importar Base de datos */
 import { pool } from "../db/db.js";
 
-/* Modulo de obtener todos los registros */
-export const getRegistros = async (req, res) => {
-  try {
-    const [result] = await pool.query(`
-    SELECT 
-      registros.id,
-      alumnos.nombre AS alumno,
-      libros.titulo AS libro,
-      registros.inicio,
-      registros.fin
-    FROM registros
-    JOIN alumnos ON registros.id_alumno = alumnos.id
-    JOIN libros ON registros.id_libro = libros.id`);
-
-    res.json({
-      id: result.insertId,
-      result
-    }).status(201);
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-/* Modulo de obtener solo un registro */
-export const getRegistro = async (req, res) => {
-  try {
-    const { id } = req.params
-    const [result] = await pool.query(`
-    SELECT 
-      registros.id,
-      alumnos.nombre AS alumno,
-      libros.titulo AS libro,
-      registros.inicio,
-      registros.fin
-    FROM registros
-    JOIN alumnos ON registros.id_alumno = alumnos.id
-    JOIN libros ON registros.id_libro = libros.id
-    WHERE id = ?`, [
-      id,
-    ]);
-
-    res.json({
-      id: result.insertId,
-      result
-    }).status(201);
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
 /* Modulo de obtener todos los alumnos */
 export const getAlumnos = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT * FROM alumnos");
+    const [result] = await pool.query("SELECT * FROM alumnos ORDER BY grado ASC, grupo ASC, apellido ASC");
 
     res
       .json({

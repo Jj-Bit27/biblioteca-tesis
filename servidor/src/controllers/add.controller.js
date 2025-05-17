@@ -1,26 +1,6 @@
 /* Importar Base de datos */
 import { pool } from '../db/db.js'
 
-/* Modulo de añadir un registro en la biblioteca */
-export const addRegistro = async (req, res) => {
-  try {
-    const { id_alumno, id_libro, inicio, fin } = req.body;
-
-    const [result] = await pool.query(
-      `INSERT INTO registros (id_alumno, id_libro, inicio, fin) VALUES (?, ?, ?, ?)`,
-      [id_alumno, id_libro, inicio, fin ]
-    );
-
-    res.json({
-      id: result.insertId,
-      id_alumno, id_libro, inicio, fin
-    }).status(201);
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
 /* Modulo de añadir un alumno */
 export const addAlumno = async (req, res) => {
   try {
@@ -28,15 +8,14 @@ export const addAlumno = async (req, res) => {
 
     const [resultados] = await pool.query("SELECT * FROM alumnos WHERE num_control = ?", [
       num_control,
-    ]);
+    ]).catch((error) => { console.log(error); });
 
-    if (resultados.length === 1)
-      return res.status(404).json({ message: "Ya esta registrado el alumno" });
+    if (resultados.length === 1) return res.status(404).json({ message: "Ya esta registrado el alumno" });
 
     const [result] = await pool.query(
       "INSERT INTO alumnos (nombre, apellido, grado, grupo, num_control) VALUES (?, ?, ?, ?, ?)",
-      [nombre, apellido, grado, grupo, num_control]
-    );
+      [nombre, apellido, grado, grupo, Number(num_control)]
+    ).catch((error) => { console.log(error); })
 
     res.json({
       id: result.insertId,
@@ -45,6 +24,7 @@ export const addAlumno = async (req, res) => {
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 

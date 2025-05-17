@@ -1,63 +1,57 @@
 import React, { useState, useEffect } from "react";
+import { Pagination } from "../TablePagination/Pagination";
 
-const BookList = () => {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const LibrosListPage = ({ libros, autores, editoriales, categorias }) => {
+  // Estados para paginación
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(10);
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/get/libros");
+  const maximo = libros ? Math.ceil(libros.length / porPagina) : 0;
 
-        if (!response.ok) {
-          throw new Error("Error al obtener los libros");
-        }
-        const { result } = await response.json();
-        setBooks(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBooks();
-  }, []);
-
-  if (loading) return <p className="text-center text-gray-500">Cargando...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!libros || libros.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
+        <p className="text-center text-gray-500">No hay libros registrados.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
-      {books.map((book) => (
-        <div
-          key={book.id}
-          className="p-4 mt-2 flex justify-between items-center border-b border-gray-300 py-4"
-        >
-          {/* Lado izquierdo: Título y autor */}
-          <div className="text-left w-1/3">
-            <h2 className="text-lg font-semibold text-gray-800">
-              {book.titulo}
-            </h2>
-            <p className="text-sm text-gray-500">{book.autor}</p>
+      {libros
+        .slice((pagina - 1) * porPagina, (pagina - 1) * porPagina + porPagina)
+        .map((libro) => (
+          <div
+            key={libro.id}
+            className="p-4 mt-2 flex justify-between items-center border-b border-gray-300 py-4"
+          >
+            <div className="text-left w-2/3">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {libro.titulo}
+              </h2>
+              <p className="text-sm text-gray-500">Autor: {libro.autor}</p>
+              <p className="text-sm text-gray-500">
+                Editorial: {libro.editorial}
+              </p>
+              <p className="text-sm text-gray-500">
+                Categoría: {libro.categoria}
+              </p>
+              <p className="text-sm text-gray-500">
+                Existencias: {libro.existencias}
+              </p>
+              <p className="text-sm text-gray-500">Páginas: {libro.paginas}</p>
+            </div>
           </div>
+        ))}
 
-          {/* Centro: Existencias */}
-          <div className="text-center w-1/3">
-            <span className="text-md font-medium text-gray-700">
-              Existencias: {book.existencias}
-            </span>
-          </div>
-
-          {/* Lado derecho: Editorial y categoría */}
-          <div className="text-right w-1/3">
-            <p className="text-sm text-gray-500">{book.editorial}</p>
-            <p className="text-sm text-gray-500">{book.categoria}</p>
-          </div>
-        </div>
-      ))}
+      <Pagination
+        pagina={pagina}
+        setPagina={setPagina}
+        maximo={maximo}
+        className="justify-center"
+      />
     </div>
   );
 };
 
-export default BookList;
+export default LibrosListPage;

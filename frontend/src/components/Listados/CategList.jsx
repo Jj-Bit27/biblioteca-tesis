@@ -1,49 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState } from "react";
 
-const CategList = () => {
-  const [categorys, setCategorys] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import { Pagination } from "../TablePagination/Pagination";
 
-  useEffect(() => {
-    const fetchCategorys = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/get/categorias");
+const CategoriasListPage = ({ categorias: categoriasProp }) => {
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(10);
 
-        if (!response.ok) {
-          throw new Error("Error al obtener los libros");
-        }
-        const { result } = await response.json();
-        setCategorys(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategorys();
-  }, []);
+  const maximo = categoriasProp ? categoriasProp.length / porPagina : 0;
 
-  if (loading) return <p className="text-center text-gray-500">Cargando...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!categoriasProp || categoriasProp.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
+        <p className="text-center text-gray-500">
+          No hay categorías registradas.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
-      {categorys.map((category) => (
-        <div
-          key={category.id}
-          className="p-4 mt-2 flex justify-between items-center border-b border-gray-300 py-4"
-        >
-          {/* Texto : Título*/}
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-gray-800 shadow-2xl">
-              {category.nombre}
-            </h2>
+      {categoriasProp
+        .slice((pagina - 1) * porPagina, (pagina - 1) * porPagina + porPagina)
+        .map((categoria) => (
+          <div
+            key={categoria.id}
+            className="p-4 mt-2 flex justify-between items-center border-b border-gray-300 py-4"
+          >
+            <div className="text-left w-full">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {categoria.nombre}
+              </h2>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+
+      <Pagination
+        pagina={pagina}
+        setPagina={setPagina}
+        maximo={maximo}
+        className="justify-center"
+      />
     </div>
   );
 };
 
-export default CategList;
+export default CategoriasListPage;

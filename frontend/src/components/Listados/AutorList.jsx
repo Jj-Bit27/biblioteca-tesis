@@ -1,56 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState } from "react";
 
-const AutorsList = () => {
-  const [books, setAutors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import { Pagination } from "../TablePagination/Pagination";
 
-  useEffect(() => {
-    const fetchAutors = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/get/autores");
+const AutoresListPage = ({ autores: autoresProp }) => {
+  const [pagina, setPagina] = useState(1);
+  const [porPagina] = useState(10);
 
-        if (!response.ok) {
-          throw new Error("Error al obtener los autores");
-        }
-        const { result } = await response.json();
-        setAutors(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAutors();
-  }, []);
+  const maximo = autoresProp ? autoresProp.length / porPagina : 0;
 
-  if (loading) return <p className="text-center text-gray-500">Cargando...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!autoresProp || autoresProp.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
+        <p className="text-center text-gray-500">No hay autores registrados.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
-      {books.map((autor) => (
-        <div
-          key={autor.id}
-          className="p-4 mt-2 flex justify-between items-center border-b border-gray-300 py-4"
-        >
-          {/* Nombre */}
-          <div className="w-1/2">
-            <h2 className="text-lg font-semibold text-gray-800">
-                {autor.nombre}
-            </h2>
+      {autoresProp
+        .slice((pagina - 1) * porPagina, (pagina - 1) * porPagina + porPagina)
+        .map((autor) => (
+          <div
+            key={autor.id}
+            className="p-4 mt-2 flex justify-between items-center border-b border-gray-300 py-4"
+          >
+            {/* Nombre y Apellido */}
+            <div className="text-left w-full">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {autor.nombre} {autor.apellido}
+              </h2>
+            </div>
           </div>
+        ))}
 
-          {/* Apellido */}
-          <div className="w-1/2">
-            <span className="text-md font-medium text-gray-700">
-              {autor.apellido}
-            </span>
-          </div>
-          </div>
-      ))}
+      <Pagination
+        pagina={pagina}
+        setPagina={setPagina}
+        maximo={maximo}
+        className="justify-center"
+      />
     </div>
   );
 };
 
-export default AutorsList;
+export default AutoresListPage;

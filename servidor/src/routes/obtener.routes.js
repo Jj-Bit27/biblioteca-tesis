@@ -12,9 +12,7 @@ import {
   getEditorials,
   getEditorial,
   getAutors,
-  getAutor,
-  getRegistros,
-  getRegistro
+  getAutor
 } from "../controllers/obtener.controller.js";
 
 const router = express.Router();
@@ -29,7 +27,5 @@ router.get("/editoriales", getEditorials);
 router.get("/editorial/:id", getEditorial);
 router.get("/autores", getAutors);
 router.get("/autor/:id", getAutor);
-router.get("/registros", getRegistros);
-router.get("/registro/:id", getRegistro);
 
 export default router;

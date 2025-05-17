@@ -1,40 +1,29 @@
-import { useState, useEffect } from "react";
+import React from "react";
+import { useState } from "react";
 
-export default function RegisterList() {
-  /* Estado para almacenar los registros */
-  const [registros, setRegisters] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import { Pagination } from "../TablePagination/Pagination";
 
-  /* Obtener los registros */
-  useEffect(() => {
-    const fetchRegister = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/registros/gets"
-        );
+const RegistrosListPage = ({ registros: registrosProp }) => {
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(10);
 
-        if (!response.ok) {
-          throw new Error("Error al obtener los registros");
-        }
-        const { result } = await response.json();
-        setRegisters(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRegister();
-  }, []);
+  const maximo = registrosProp ? registrosProp.length / porPagina : 0;
 
-  if (loading) return <p className="text-center text-gray-500">Cargando...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>
+  if (!registrosProp || registrosProp.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
+        <p className="text-center text-gray-500">
+          No hay registros disponibles.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <ul className="divide-y divide-gray-300">
-        {registros.map((registro) => (
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-2xl rounded-lg mt-9 mb-6">
+      {registrosProp
+        .slice((pagina - 1) * porPagina, (pagina - 1) * porPagina + porPagina)
+        .map((registro) => (
           <li
             key={registro.id}
             className="flex items-center justify-between py-4"
@@ -56,11 +45,17 @@ export default function RegisterList() {
                 Fin: {new Date(registro.fin).toLocaleDateString()}
               </p>
             </div>
-
           </li>
         ))}
-      </ul>
+
+      <Pagination
+        pagina={pagina}
+        setPagina={setPagina}
+        maximo={maximo}
+        className="justify-center"
+      />
     </div>
   );
-}
+};
 
+export default RegistrosListPage;
