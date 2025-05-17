@@ -30,7 +30,7 @@ const corsOptions = {
 };
 
 /* Hacemos que sea JSON la respuesta y que pueda acceder el frontend al backend */
-server.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
